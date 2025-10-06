@@ -1,30 +1,35 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// ذخیره‌سازی و مدیریت موجودی کاربر (خریدار یا فروشنده)
+/// Local persistent balance handler for SOMA Offline.
+/// Keeps Buyer and Seller wallet values separately.
 class BalanceStore {
-  static const String _key = 'balance';
+  static const String _buyerKey = 'buyer_balance';
+  static const String _sellerKey = 'seller_balance';
 
-  /// دریافت موجودی فعلی
-  static Future<int> getBalance() async {
+  /// Get current balance for Buyer or Seller.
+  static Future<int> getBalance({required bool isBuyer}) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_key) ?? 100000; // مقدار پیش‌فرض: ۱۰۰٬۰۰۰ ریال
+    return prefs.getInt(isBuyer ? _buyerKey : _sellerKey) ?? (isBuyer ? 100000 : 0);
   }
 
-  /// تنظیم موجودی جدید
-  static Future<void> setBalance(int value) async {
+  /// Update balance value.
+  static Future<void> setBalance(int value, {required bool isBuyer}) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_key, value);
+    await prefs.setInt(isBuyer ? _buyerKey : _sellerKey, value);
   }
 
-  /// افزایش موجودی
+  /// Add amount to Seller balance.
   static Future<void> increase(int amount) async {
-    final current = await getBalance();
-    await setBalance(current + amount);
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(_sellerKey) ?? 0;
+    await prefs.setInt(_sellerKey, current + amount);
   }
 
-  /// کاهش موجودی
+  /// Subtract amount from Buyer balance.
   static Future<void> decrease(int amount) async {
-    final current = await getBalance();
-    await setBalance((current - amount).clamp(0, double.infinity).toInt());
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(_buyerKey) ?? 100000;
+    final newVal = current - amount;
+    await prefs.setInt(_buyerKey, newVal < 0 ? 0 : newVal);
   }
 }
