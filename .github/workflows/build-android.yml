@@ -1,4 +1,4 @@
-name: Build Android APKs (SOMA App Q.B)
+name: Build Android APKs
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Java 17
@@ -26,11 +26,10 @@ jobs:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Flutter clean
-        run: flutter clean
-
       - name: Install dependencies
-        run: flutter pub get
+        run: |
+          flutter clean
+          flutter pub get
 
       - name: Build Buyer APK
         run: flutter build apk --release -t lib/buyer_main.dart -o build/app/outputs/flutter-apk/buyer.apk
@@ -38,7 +37,7 @@ jobs:
       - name: Build Seller APK
         run: flutter build apk --release -t lib/seller_main.dart -o build/app/outputs/flutter-apk/seller.apk
 
-      - name: Upload APKs
+      - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: soma-apks
