@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Java 17
@@ -26,16 +26,22 @@ jobs:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Install dependencies
+      - name: Flutter clean & get packages
         run: |
           flutter clean
           flutter pub get
 
       - name: Build Buyer APK
-        run: flutter build apk --release -t lib/buyer_main.dart -o build/app/outputs/flutter-apk/buyer.apk
+        run: flutter build apk --release -t lib/buyer_main.dart
+
+      - name: Rename Buyer APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/buyer.apk
 
       - name: Build Seller APK
-        run: flutter build apk --release -t lib/seller_main.dart -o build/app/outputs/flutter-apk/seller.apk
+        run: flutter build apk --release -t lib/seller_main.dart
+
+      - name: Rename Seller APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/seller.apk
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
