@@ -1,22 +1,8 @@
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'dev.flutter.flutter-gradle-plugin'
 }
-
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode', '1').toInteger()
-def flutterVersionName = localProperties.getProperty('flutter.versionName', '1.0')
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.example.soma_app_qb"
@@ -24,10 +10,10 @@ android {
 
     defaultConfig {
         applicationId "com.example.soma_app_qb"
-        minSdk 21
+        minSdk 23
         targetSdk 34
-        versionCode flutterVersionCode
-        versionName flutterVersionName
+        versionCode 1
+        versionName "1.0"
         multiDexEnabled true
     }
 
@@ -42,18 +28,18 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
+            signingConfig signingConfigs.debug
         }
     }
 }
 
 flutter {
-    source '../..'
+    source = "../.."
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"
     implementation 'androidx.multidex:multidex:2.0.1'
 }
