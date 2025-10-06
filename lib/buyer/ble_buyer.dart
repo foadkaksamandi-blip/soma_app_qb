@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../common/ble_ids.dart';
 import '../state/balance_store.dart';
@@ -18,6 +18,7 @@ class BleBuyer {
     await FlutterBluePlus.turnOn();
     final completer = Completer<void>();
 
+    // شروع اسکن برای فروشنده
     _scanSub = FlutterBluePlus.scanResults.listen((results) async {
       for (final r in results) {
         if (r.device.platformName.contains("SOMA_Seller")) {
@@ -38,6 +39,7 @@ class BleBuyer {
 
     _connSub = FlutterBluePlus.onConnectionStateChanged.listen((s) async {
       if (s.device != _device) return;
+
       if (s.connectionState == BluetoothConnectionState.connected) {
         final services = await _device!.discoverServices();
 
@@ -65,6 +67,7 @@ class BleBuyer {
     }
     await BalanceStore.setBalance(old - amount);
 
+    // ساخت payload: [amount(4)] [nameLen(4)] [name]
     final nameBytes = Uint8List.fromList(buyerName.codeUnits);
     final payload = Uint8List(8 + nameBytes.length)
       ..buffer.asByteData().setUint32(0, amount, Endian.little)
@@ -73,6 +76,7 @@ class BleBuyer {
 
     await _amountChar!.write(payload, withoutResponse: false);
 
+    // گوش دادن برای ACK
     final sub = _ackChar!.onValueReceived.listen((val) {
       if (val.length >= 4) {
         final newBal = ByteData.sublistView(val, 0, 4).getUint32(0, Endian.little);
@@ -82,7 +86,7 @@ class BleBuyer {
     });
 
     await done.future.timeout(const Duration(seconds: 10));
-    sub.cancel();
+    await sub.cancel();
     await _device?.disconnect();
   }
 
