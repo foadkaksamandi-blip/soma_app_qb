@@ -1,34 +1,29 @@
-import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
-/// Requests all needed runtime permissions for BLE on Android.
-/// Returns `true` if everything is granted.
-Future<bool> requestBlePermissions() async {
-  if (!Platform.isAndroid) return true;
+/// Handles runtime permission requests for BLE & Location.
+class BlePermissions {
+  /// Requests all necessary permissions for Bluetooth operations.
+  static Future<bool> requestAll() async {
+    final statuses = await [
+      Permission.bluetooth,
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.bluetoothAdvertise,
+      Permission.locationWhenInUse,
+    ].request();
 
-  final statuses = await [
-    Permission.bluetooth,
-    Permission.bluetoothScan,
-    Permission.bluetoothConnect,
-    Permission.bluetoothAdvertise,
-    Permission.locationWhenInUse, // required by many devices for BLE scan
-  ].request();
+    return statuses.values.every((s) => s.isGranted);
+  }
 
-  return statuses.every((s) => s.isGranted);
+  /// Checks if all required permissions are already granted.
+  static Future<bool> checkAll() async {
+    final statuses = await Future.wait([
+      Permission.bluetooth.status,
+      Permission.bluetoothScan.status,
+      Permission.bluetoothConnect.status,
+      Permission.bluetoothAdvertise.status,
+      Permission.locationWhenInUse.status,
+    ]);
+    return statuses.every((s) => s.isGranted);
+  }
 }
-
-/// Checks (without prompting) whether required BLE permissions are granted.
-Future<bool> hasBlePermissions() async {
-  if (!Platform.isAndroid) return true;
-
-  final checks = await Future.wait<bool>([
-    Permission.bluetooth.isGranted,
-    Permission.bluetoothScan.isGranted,
-    Permission.bluetoothConnect.isGranted,
-    Permission.bluetoothAdvertise.isGranted,
-    Permission.locationWhenInUse.isGranted,
-  ]);
-
-  return checks.every((ok) => ok);
-}
-```0
