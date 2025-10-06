@@ -1,25 +1,33 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// مدیریت موجودی محلی برای Buyer و Seller
 class BalanceStore {
-  static const String _key = 'balance';
+  static const _buyerKey = 'buyer_balance';
+  static const _sellerKey = 'seller_balance';
 
-  static Future<int> getBalance() async {
+  /// دریافت موجودی خریدار
+  static Future<int> getBuyerBalance() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_key) ?? 100000; // default balance in Rial
+    return prefs.getInt(_buyerKey) ?? 100000; // مقدار پیش‌فرض 100,000 ریال
   }
 
-  static Future<void> setBalance(int value) async {
+  /// دریافت موجودی فروشنده
+  static Future<int> getSellerBalance() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_key, value);
+    return prefs.getInt(_sellerKey) ?? 0;
   }
 
-  static Future<void> increase(int amount) async {
-    final current = await getBalance();
-    await setBalance(current + amount);
+  /// کاهش موجودی خریدار پس از پرداخت
+  static Future<void> decreaseBuyerBalance(int amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(_buyerKey) ?? 100000;
+    prefs.setInt(_buyerKey, current - amount);
   }
 
-  static Future<void> decrease(int amount) async {
-    final current = await getBalance();
-    await setBalance((current - amount).clamp(0, double.infinity).toInt());
+  /// افزایش موجودی فروشنده پس از دریافت
+  static Future<void> increaseSellerBalance(int amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(_sellerKey) ?? 0;
+    prefs.setInt(_sellerKey, current + amount);
   }
 }
