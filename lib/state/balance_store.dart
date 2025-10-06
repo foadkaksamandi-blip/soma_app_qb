@@ -1,35 +1,44 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Local persistent balance handler for SOMA Offline.
-/// Keeps Buyer and Seller wallet values separately.
+/// A helper class to store and manage user balances locally.
 class BalanceStore {
   static const String _buyerKey = 'buyer_balance';
   static const String _sellerKey = 'seller_balance';
+  static const String _txnKey = 'last_transaction';
 
-  /// Get current balance for Buyer or Seller.
-  static Future<int> getBalance({required bool isBuyer}) async {
+  /// Gets the buyer's current balance.
+  static Future<int> getBuyerBalance() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(isBuyer ? _buyerKey : _sellerKey) ?? (isBuyer ? 100000 : 0);
+    return prefs.getInt(_buyerKey) ?? 100000; // Default: 100,000 Rial
   }
 
-  /// Update balance value.
-  static Future<void> setBalance(int value, {required bool isBuyer}) async {
+  /// Gets the seller's current balance.
+  static Future<int> getSellerBalance() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(isBuyer ? _buyerKey : _sellerKey, value);
+    return prefs.getInt(_sellerKey) ?? 0;
   }
 
-  /// Add amount to Seller balance.
-  static Future<void> increase(int amount) async {
+  /// Updates buyer balance.
+  static Future<void> setBuyerBalance(int value) async {
     final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getInt(_sellerKey) ?? 0;
-    await prefs.setInt(_sellerKey, current + amount);
+    await prefs.setInt(_buyerKey, value);
   }
 
-  /// Subtract amount from Buyer balance.
-  static Future<void> decrease(int amount) async {
+  /// Updates seller balance.
+  static Future<void> setSellerBalance(int value) async {
     final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getInt(_buyerKey) ?? 100000;
-    final newVal = current - amount;
-    await prefs.setInt(_buyerKey, newVal < 0 ? 0 : newVal);
+    await prefs.setInt(_sellerKey, value);
+  }
+
+  /// Records last transaction details.
+  static Future<void> recordTransaction(String details) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_txnKey, details);
+  }
+
+  /// Returns last recorded transaction.
+  static Future<String?> getLastTransaction() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_txnKey);
   }
 }
