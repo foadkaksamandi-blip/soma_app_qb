@@ -1,44 +1,25 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// A helper class to store and manage user balances locally.
 class BalanceStore {
-  static const String _buyerKey = 'buyer_balance';
-  static const String _sellerKey = 'seller_balance';
-  static const String _txnKey = 'last_transaction';
+  static const String _key = 'balance';
 
-  /// Gets the buyer's current balance.
-  static Future<int> getBuyerBalance() async {
+  static Future<int> getBalance() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_buyerKey) ?? 100000; // Default: 100,000 Rial
+    return prefs.getInt(_key) ?? 100000; // default balance in Rial
   }
 
-  /// Gets the seller's current balance.
-  static Future<int> getSellerBalance() async {
+  static Future<void> setBalance(int value) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_sellerKey) ?? 0;
+    await prefs.setInt(_key, value);
   }
 
-  /// Updates buyer balance.
-  static Future<void> setBuyerBalance(int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_buyerKey, value);
+  static Future<void> increase(int amount) async {
+    final current = await getBalance();
+    await setBalance(current + amount);
   }
 
-  /// Updates seller balance.
-  static Future<void> setSellerBalance(int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_sellerKey, value);
-  }
-
-  /// Records last transaction details.
-  static Future<void> recordTransaction(String details) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_txnKey, details);
-  }
-
-  /// Returns last recorded transaction.
-  static Future<String?> getLastTransaction() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_txnKey);
+  static Future<void> decrease(int amount) async {
+    final current = await getBalance();
+    await setBalance((current - amount).clamp(0, double.infinity).toInt());
   }
 }
