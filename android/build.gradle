@@ -1,12 +1,10 @@
+// Top-level build for Gradle 8 / AGP 8
 buildscript {
     repositories {
         google()
         mavenCentral()
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.4.1'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23'
-    }
+    // (بدون classpath قدیمی — از plugins DSL استفاده می‌کنیم)
 }
 
 allprojects {
@@ -14,8 +12,4 @@ allprojects {
         google()
         mavenCentral()
     }
-}
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
 }
