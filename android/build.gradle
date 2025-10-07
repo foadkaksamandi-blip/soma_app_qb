@@ -1,4 +1,4 @@
-// Project-level Gradle build (AGP 7.4.2 + Gradle 7.6.3 + Java 17)
+// Project-level Gradle build (Option A: AGP 7.4.2 + Gradle 7.6.3 + Java 17)
 
 buildscript {
     ext.kotlin_version = '1.8.22'
@@ -10,6 +10,15 @@ buildscript {
         classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
+}
+
+// >>> مهم: مقادیر موردنیاز پلاگین‌ها (flutter_*):
+ext {
+    flutter = [
+        compileSdkVersion: 34,
+        minSdkVersion    : 21,
+        targetSdkVersion : 34
+    ]
 }
 
 allprojects {
@@ -24,7 +33,7 @@ subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
-    // Ensure app is evaluated first for Flutter tasks
+    // باعث می‌شود flutter.gradle داخل app قبل از پلاگین‌ها evaluate شود
     project.evaluationDependsOn(':app')
 }
 
