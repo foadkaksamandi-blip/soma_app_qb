@@ -1,11 +1,11 @@
 name: soma_app_qb
 description: SOMA Offline – Buyer & Seller (BLE + QR)
 publish_to: 'none'
+
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
-  flutter: '3.19.6'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -14,13 +14,13 @@ dependencies:
   shared_preferences: ^2.2.3
   permission_handler: ^11.3.1
   intl: ^0.19.0
-  qr_flutter: ^4.1.0
+  qr_flutter: ^4.2.0
   cupertino_icons: ^1.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^3.0.2
 
 flutter:
   uses-material-design: true
