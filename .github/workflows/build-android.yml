@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Java 17
@@ -20,13 +20,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Flutter
+      - name: Setup Flutter 3.19.6
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
           channel: 'stable'
+          cache: true
 
-      - name: Flutter clean & get packages
+      - name: Flutter clean & pub get
         run: |
           flutter clean
           flutter pub get
@@ -34,19 +35,19 @@ jobs:
       - name: Build Buyer APK
         run: flutter build apk --release -t lib/buyer_main.dart
 
-      - name: Rename Buyer APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/buyer.apk
+      - name: Rename Buyer
+        run: mv build/app/outputs/flutter-apk/app-release.apk buyer.apk
 
       - name: Build Seller APK
         run: flutter build apk --release -t lib/seller_main.dart
 
-      - name: Rename Seller APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/seller.apk
+      - name: Rename Seller
+        run: mv build/app/outputs/flutter-apk/app-release.apk seller.apk
 
-      - name: Upload APK artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: soma-apks
           path: |
-            build/app/outputs/flutter-apk/buyer.apk
-            build/app/outputs/flutter-apk/seller.apk
+            buyer.apk
+            seller.apk
